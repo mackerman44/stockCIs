@@ -9,5 +9,9 @@
 #' @export
 #' @return NULL
 
+resampit <- function(pbtAssignments = NULL, pbtTagRate = NULL, bootstraps = 500, ci = 0.90, abundance = NULL)
+{
 
 
+
+}
