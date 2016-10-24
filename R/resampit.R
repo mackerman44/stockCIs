@@ -80,5 +80,4 @@ resampit <- function(stockAssignments = NULL, tagRates = NULL, bootstraps = 500,
 
   write.csv(results,   file = "results.csv")
   write.csv(propTable, file = "propTable.csv")
-
 }
