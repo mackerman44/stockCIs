@@ -1,0 +1,11 @@
+Package: stockCIs
+Type: Package
+Title: Bootstrapping for CIs of Fish Stocks
+Version: 0.1.0
+Date: 10-24-2016
+Author: Mike Ackerman <mackerman@qcinc.org>
+Maintainer: Mike Ackerman <mackerman@qcinc.org>
+Description: stockCIs is an R package that performs bootrapping of fish stock data (generally obtained from PBT or GSI) to generate confidence intervals around fish stock point estimates.
+License: GPL-2
+LazyData: TRUE
+RoxygenNote: 5.0.1
