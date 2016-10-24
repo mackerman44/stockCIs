@@ -6,7 +6,6 @@
 #' @param tagRates description here
 #' @param bootstraps The number of bootstraps to be performed
 #' @param ci The confidence interval to be generated
-#' @param abundance If abundance results are desired, enter the estimated abundance
 #'
 #' @author Mike Ackerman
 #'

@@ -5,7 +5,7 @@
 \title{resampit: Simple bootstrapping of fish stocks to generate CIs}
 \usage{
 resampit(stockAssignments = NULL, tagRates = NULL, bootstraps = 500,
-  ci = 0.9, abundance = NULL)
+  ci = 0.9)
 }
 \arguments{
 \item{stockAssignments}{description here}
