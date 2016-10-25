@@ -15,8 +15,6 @@ resampit(stockAssignments = NULL, tagRates = NULL, bootstraps = 500,
 \item{bootstraps}{The number of bootstraps to be performed}
 
 \item{ci}{The confidence interval to be generated}
-
-\item{abundance}{If abundance results are desired, enter the estimated abundance}
 }
 \description{
 Bootstrap stock assignments to generate CIs
