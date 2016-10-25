@@ -87,7 +87,49 @@ bootstock <- function(stockAssignments = NULL, tagRates = NULL, reallocateTable 
   }
   # END BOOTSTRAP LOOP
 
+  # Now, PBT stock frequencies within each bootstrap iteration must be expanded according to PBT tagging rates
+  expansionTable <- freqTable
+  # BEGIN EXPANSION LOOP ACROSS ALL ITERATIONS IN expansionTable
+  for (hatcheryStock in hatcheryList)
+  {
+    if (hatcheryStock %in% tagRates[,1])
+    {
+      expansionTable[,hatcheryStock] <- as.numeric(freqTable[,hatcheryStock]) / tagRates[as.character(tagRates[,1]) == hatcheryStock,2]
+    } else
+    {
+      print(paste(hatcheryStock, "has no tagging rate defined in tagRates"))
+    }
+  }
+  # END EXPANSION LOOP
+
+  # NOTE: At this point rows within expansionTable sum to > sampleSize. We still need to correct
+  # GSI stock frequencies
+
+  # These are the numbers that we added to each hatchery stock in each bootstrap iteration
+  expDiffTable <- expansionTable[,hatcheryList] - freqTable[,hatcheryList]
+
+  # BEGIN REALLOCATION LOOP ACROSS ALL ITERATIONS IN expansionTable
+
+
 ##########################################################################################################
+
+  # BEGIN REALLOCATION LOOP ACROSS ALL ITERATIONS IN expansion.table
+  for (hatchery.by in hatchery.list)
+  {
+    hatchery.release <- as.character(unique(assignment.table$hatchery_fish_release_location[which(assignment.table$stock_assignment==hatchery.by)]))
+    for (rg in wild.list)
+    {
+      if(any(names(reallocation.table)==rg))
+      {
+        expansion.table[,rg] <- expansion.table[,rg] - (exp.diff.table[,hatchery.by]*reallocation.table[which(reallocation.table$hatchery_stock_release_location==hatchery.release),rg])
+      }
+    }
+  }
+  head(expansion.table)
+
+  # A check to make sure sample sizes within each iteration now sum roughly equal to your original
+  # sample size
+  apply(expansion.table,1,sum)
 
 
 
