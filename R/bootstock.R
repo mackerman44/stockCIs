@@ -37,5 +37,45 @@ bootstock <- function(stockAssignments = NULL, tagRates = NULL, reallocateTable 
   # WHAT IS THE SAMPLE SIZE?
   sampleSize <- nrow(stockAssignments)
 
+  # Below are 2 loops:
+  # 1) First, we will expand the PBT assignments based on tagging rates for the original dataset (stockAssignments)
+  # 2) Second, we will re-allocate the expanded individuals from GSI stocks (i.e., we will remove the expanded
+  # individuals from the GSI stocks based on genetic similarities between PBT and GSI groups)
+
+  expPointEsts <- stockFreq
+  for(hatcheryStock in hatcheryList)
+  {
+    if(hatcheryStock %in% tagRates[,1])
+    {
+      expPointEsts[1,hatcheryStock] <- stockFreq[hatcheryStock] / tagRates[as.character(tagRates[,1]) == hatcheryStock,2]
+    } else
+    {
+      print(paste(hatcheryStock, "has no tagging rate defined in tagRates"))
+    }
+  }
+  # END PBT EXPANSION LOOP
+
+  # Let's calculate the number of fish that were added to each PBT stock
+  expPointEstsDiff <- expPointEsts[,hatcheryList] - stockFreq[,hatcheryList]
+  # BEING GSI -> PBT REALLOCATION LOOP
+  for (hatcheryStock in hatcheryList)
+  {
+    hatcheryRelease <- as.character(unique(stockAssignments$hatchery_fish_release_location[which(stockAssignments$stock == hatcheryStock)]))
+    for (rg in wildList)
+    {
+      if(any(names(reallocateTable) == rg))
+      {
+        expPointEsts[,rg] <- expPointEsts[,rg] - (expPointEstsDiff[1,hatcheryStock] * reallocateTable[which(reallocateTable$hatchery_stock_release_location == hatcheryRelease), rg])
+      }
+    }
+  }
+  # END GSI -> PBT REALLOCATION LOOP
+
+  pointEstimates <- expPointEsts / sampleSize
+  pointEstimates <- round(pointEstimates,2)
+  # END POINT ESTIMATES
+
+##########################################################################################################
+
 
 }
