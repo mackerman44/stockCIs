@@ -75,7 +75,20 @@ bootstock <- function(stockAssignments = NULL, tagRates = NULL, reallocateTable 
   pointEstimates <- round(pointEstimates,2)
   # END POINT ESTIMATES
 
+  # Begin bootstrapping routine to calculate confidence intervals and CVs for each stock
+  freqTable        <- as.data.frame(matrix(rep(NA,(bootstraps*length(stockNames))), bootstraps, length(stockNames)))
+  names(freqTable) <- stockNames
+
+  # BEGIN BOOTSTRAP LOOP. This may take a couple or more minutes depending on sample size and number of bootstraps.
+  for (b in 1:bootstraps)
+  {
+    resample      <- sample(x = as.character(stockAssignments$stock), size = sampleSize, replace = TRUE)
+    freqTable[b,] <- lapply(as.character(stockNames), function(x) length(resample[resample == x]))
+  }
+  # END BOOTSTRAP LOOP
+
 ##########################################################################################################
+
 
 
 }
