@@ -109,28 +109,36 @@ bootstock <- function(stockAssignments = NULL, tagRates = NULL, reallocateTable 
   expDiffTable <- expansionTable[,hatcheryList] - freqTable[,hatcheryList]
 
   # BEGIN REALLOCATION LOOP ACROSS ALL ITERATIONS IN expansionTable
-
-
-##########################################################################################################
-
-  # BEGIN REALLOCATION LOOP ACROSS ALL ITERATIONS IN expansion.table
-  for (hatchery.by in hatchery.list)
+  for (hatcheryStock in hatcheryList)
   {
-    hatchery.release <- as.character(unique(assignment.table$hatchery_fish_release_location[which(assignment.table$stock_assignment==hatchery.by)]))
-    for (rg in wild.list)
+    hatcheryRelease <- as.character(unique(stockAssignments$hatchery_fish_release_location[which(stockAssignments$stock == hatcheryStock)]))
+    for (rg in wildList)
     {
-      if(any(names(reallocation.table)==rg))
+      if(any(names(reallocateTable) == rg))
       {
-        expansion.table[,rg] <- expansion.table[,rg] - (exp.diff.table[,hatchery.by]*reallocation.table[which(reallocation.table$hatchery_stock_release_location==hatchery.release),rg])
+        expansionTable[,rg] <- expansionTable[,rg] - (expDiffTable[,hatcheryStock]*reallocateTable[which(reallocateTable$hatchery_stock_release_location == hatcheryRelease),rg])
       }
     }
   }
-  head(expansion.table)
 
-  # A check to make sure sample sizes within each iteration now sum roughly equal to your original
-  # sample size
-  apply(expansion.table,1,sum)
+  # Create a table of stock proportions. Every value in the expansionTable is divided by the sampleSize
+  propTable  <- expansionTable / sampleSize
 
+  # Not let's generate some summary statistics from the propTable (mean, median, LCI, UCI, sd)
+  resultsBoot  <- data.frame(group = names(propTable), mean = apply(propTable, 2, mean), median = apply(propTable, 2, median),
+                             lci = apply(propTable, 2, quantile, (1-ci)/2), uci = apply(propTable, 2, quantile, ((1-ci)/2)+ci),
+                             sd = apply(propTable, 2, sd))
+  resultsBoot$CV <- (resultsBoot$sd/resultsBoot$mean) * 100
 
+  resultsPoint <- as.data.frame(t(pointEstimates))
+  resultsPoint$group <- row.names(resultsPoint)
 
+  results <- merge(resultsBoot, resultsPoint, by = "group")
+  results <- results[,c("group","V1","mean","median","lci","uci","sd","CV")]
+  print(results)
+
+  # WRITE RESULTS
+  write.csv(results, file = "results.csv")
+  write.csv(propTable, file = "stock_proportions_bootstraps.csv")
 }
+# END BOOTSTOCK
