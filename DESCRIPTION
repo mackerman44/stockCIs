@@ -1,7 +1,7 @@
 Package: stockCIs
 Type: Package
-Title: Bootstrapping for CIs of Fish Stocks
-Version: 0.1.0
+Title: Bootstrapping to generate CIs for fish stock point estimates
+Version: 0.1.1
 Date: 10-24-2016
 Author: Mike Ackerman <mackerman@qcinc.org>
 Maintainer: Mike Ackerman <mackerman@qcinc.org>
