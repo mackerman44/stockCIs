@@ -46,9 +46,21 @@ resampit <- function(stockAssignments = NULL, tagRates = NULL, bootstraps = 500,
     {
       print(paste(stock, "has no tagging rate defined in tagRates"))
     }
-  }
+  } # END EXPANSION LOOP
   # Now we need to reduce the 'Unassigned' column by the amount that all stocks were expanded
   expansionTable[,"Unassigned"] <- sampleSize - apply(expansionTable[,-match("Unassigned", stocks)], 1, sum)
+
+  # This is a correction in the case where Unassigned < 0 after correcting for tagging rates
+  for (i in 1:nrow(expansionTable))
+  {
+    if (expansionTable[i,"Unassigned"] < 0)
+    {
+      correction <- (expansionTable[i,-which(colnames(expansionTable) == "Unassigned")] / sum(expansionTable[i,-which(colnames(expansionTable) == "Unassigned")])) * abs(expansionTable[i,"Unassigned"])
+      expansionTable[i,-which(colnames(expansionTable) == "Unassigned")] <- expansionTable[i,-which(colnames(expansionTable) == "Unassigned")] - correction
+      expansionTable[i,"Unassigned"] <- 0
+    }
+  }
+  ### END CORRECTION LOOP
 
   # Now we want to create a table of proportions...the 'expansionTable' is divided by the total sample size
   propTable <- expansionTable / sampleSize
@@ -64,6 +76,17 @@ resampit <- function(stockAssignments = NULL, tagRates = NULL, bootstraps = 500,
     }
   }
   expandedFreq[1,"Unassigned"] <- sampleSize - sum(expandedFreq[1, as.character(stocks[-match("Unassigned", stocks)])])
+
+  ### Correction of point estimates IF Unassigned < 0
+  if(expandedFreq[1,"Unassigned"] < 0)
+  {
+    pointCorrect <- (expandedFreq[1,-which(colnames(expandedFreq) == "Unassigned")] / sum(expandedFreq[1,-which(colnames(expandedFreq) == "Unassigned")])) * abs(expandedFreq[1,"Unassigned"])
+    expandedFreq[1,-which(colnames(expandedFreq) == "Unassigned")] <- expandedFreq[1,-which(colnames(expandedFreq) == "Unassigned")] - pointCorrect
+    expandedFreq[1,"Unassigned"] <- 0
+  }
+  # END OF POINT ESTIMATE CORRECTION
+
+  # Convert point extimates to proportions
   pointEstimates <- expandedFreq/sampleSize
 
   # Now let's generate some summary statistics based on propTable (Lower CI, Upper CI, Mean of iterations,
@@ -73,9 +96,11 @@ resampit <- function(stockAssignments = NULL, tagRates = NULL, bootstraps = 500,
   mean   <- apply(propTable, 2, mean)
   median <- apply(propTable, 2, median)
   stDev  <- apply(propTable, 2, sd)
+  se <- function(x) sd(x)/sqrt(length(x)) # Function to calculate standard error
+  stdErr <- apply(propTable, 2, se)
   cv     <- (stDev/mean)*100
 
-  results <- cbind(t(pointEstimates), mean, median, lci, uci, stDev, cv)
+  results <- cbind(t(pointEstimates), mean, median, lci, uci, stDev, stdErr, cv)
 
   write.csv(results,   file = "results.csv")
   write.csv(propTable, file = "propTable.csv")
