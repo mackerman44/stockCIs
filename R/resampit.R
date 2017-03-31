@@ -26,11 +26,7 @@
 
 resampit <- function(assignmentFile = NULL, assignmentColumn = "groups", tagRates = NULL,
                      bootstraps = 500, ci = 0.90)
+{
 
+}
 
-#    2) A .csv file containing tagging rates
-#
-#  File must contain two columns labelled 'hatchery' and 'tag_rate'. The code used in the 'hatchery' column MUST match the code used
-#  in the 'pbt' column of 'pbt_assignments.csv'
-#
-#  IMPORTANT: Tagging rates must be expressed as a proportions (NOT as a percentage)

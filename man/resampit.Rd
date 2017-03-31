@@ -2,22 +2,35 @@
 % Please edit documentation in R/resampit.R
 \name{resampit}
 \alias{resampit}
-\title{resampit: Simple bootstrapping of fish stocks to generate CIs}
+\title{resampit: Simple bootstrapping of fish groups to generate CIs}
 \usage{
-resampit(stockAssignments = NULL, tagRates = NULL, bootstraps = 500,
-  ci = 0.9)
+resampit(assignmentFile = NULL, assignmentColumn = "groups",
+  tagRates = NULL, bootstraps = 500, ci = 0.9)
 }
 \arguments{
-\item{stockAssignments}{description here}
+\item{assignmentFile}{The .csv file containing the group (e.g, PBT) assignments including those fish that could not
+be assigned to a group.}
 
-\item{tagRates}{description here}
+\item{assignmentColumn}{The name of the column in \code{assignmentFile} containing the group assignments. In the
+case of PBT, this column should contain the hatchery and brood year (BY) combination for any assigned fish.
+For example, OtsRAPH08 may represent a fish that assigns to Rapid River hatchery broodstock spawned in 2008.
+Note that every group defined in this column MUST have a tagging rate defined in the \code{tagRates} file (see
+below). Otherwise, an error will print (e.g., "OtsRAPH08 has no tagging rate defined") and assignments for that
+group will NOT be expanded. Fish that did not assign to a group MUST contain "Unassigned" in this column.}
 
-\item{bootstraps}{The number of bootstraps to be performed}
+\item{tagRates}{The .csv file containing tagging rates for any group defined in the \code{assignmentColumn} column of
+\code{assignmentFile}. The file should only contain 2 columns. The first column should contain group names that
+MUST match the group names used in the \code{assignmentColumn} column of \code{assignmentFile}. Tagging rates must
+be expressed as proportions.}
 
-\item{ci}{The confidence interval to be generated}
+\item{bootstraps}{The number of bootstraps to be performed.}
+
+\item{ci}{The confidence interval to be generated expreseed as a proportion (e.g., 0.90 or 0.95).}
 }
 \description{
-Bootstrap stock assignments to generate CIs
+resampit() is a function that re-samples (bootstraps) a table of group assignments (e.g., from PBT
+GSI, PIT tags, etc.) and then expands those groups according to group-specific tag rates to generate
+confidence intervals around group proportion estimates.
 }
 \author{
 Mike Ackerman
